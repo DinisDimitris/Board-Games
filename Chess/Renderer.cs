@@ -7,6 +7,7 @@ using OpenTK.Mathematics;
 
 namespace Engine.Render
 {
+    //testing
     public class Renderer : GameWindow
     {
         private readonly float[] _vertices =
