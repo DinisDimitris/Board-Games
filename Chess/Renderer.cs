@@ -64,6 +64,10 @@ namespace Engine.Render
             // The EBO has now been properly setup. Go to the Render function to see how we draw our rectangle now!
             _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
             _shader.Use();
+
+            _view = Matrix4.CreateTranslation(0.0f, 0.0f, -3.0f);
+
+            _projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), Size.X / (float)Size.Y, 0.1f, 100.0f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -72,23 +76,16 @@ namespace Engine.Render
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            
             _model = Matrix4.CreateTranslation(0.5f,0.0f,0.0f);
-
-            //_shader.SetMatrix4("transform", _transform);
 
             _shader.Use();
 
-            // Because ElementArrayObject is a property of the currently bound VAO,
-            // the buffer you will find in the ElementArrayBuffer will change with the currently bound VAO.
             GL.BindVertexArray(_vertexArrayObject);
 
-            // Then replace your call to DrawTriangles with one to DrawElements
-            // Arguments:
-            //   Primitive type to draw. Triangles in this case.
-            //   How many indices should be drawn. Six in this case.
-            //   Data type of the indices. The indices are an unsigned int, so we want that here too.
-            //   Offset in the EBO. Set this to 0 because we want to draw the whole thing.
+            _shader.SetMatrix4("model", _model);
+            _shader.SetMatrix4("view", _view);
+            _shader.SetMatrix4("projection", _projection);
+
             GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
             SwapBuffers();
