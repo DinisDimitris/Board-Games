@@ -7,7 +7,6 @@ using OpenTK.Mathematics;
 
 namespace Engine.Render
 {
-    //testing
     public class Renderer : GameWindow
     {
         private readonly float[] _vertices =
@@ -30,7 +29,9 @@ namespace Engine.Render
 
         private Shader _shader;
 
-        private Matrix4 _transform;
+        private Matrix4 _model;
+        private Matrix4 _view;
+        private Matrix4 _projection;
 
         private int _elementBufferObject;
 
@@ -72,7 +73,7 @@ namespace Engine.Render
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             
-            _transform = Matrix4.CreateTranslation(0.5f,0.0f,0.0f);
+            _model = Matrix4.CreateTranslation(0.5f,0.0f,0.0f);
 
             //_shader.SetMatrix4("transform", _transform);
 
