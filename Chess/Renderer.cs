@@ -13,10 +13,10 @@ namespace Engine.Render
     {
         private readonly float[] _vertices =
         {
-             0.10f,  0.10f, 0.0f, // top right
-             0.10f, -0.10f, 0.0f, // bottom right
-            -0.10f, -0.10f, 0.0f, // bottom left
-            -0.10f,  0.10f, 0.0f, // top left
+             0.45f,  0.45f, 0.0f, // top right
+             0.45f, -0.45f, 0.0f, // bottom right
+            -0.45f, -0.45f, 0.0f, // bottom left
+            -0.45f,  0.45f, 0.0f, // top left
         };
 
         private readonly uint[] _indices =
@@ -68,7 +68,7 @@ namespace Engine.Render
 
             _view = Matrix4.CreateTranslation(0.5f, 0.5f, -0.0005f);
 
-            _projection  = Matrix4.CreateOrthographicOffCenter(0.0f , 8.0f, 0.0f , 8.0f, -50.0f, 100.0f);
+            _projection  = Matrix4.CreateOrthographicOffCenter(0.0f , 8.0f, 0.0f , 8.0f, -0.1f, 100.0f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
