@@ -1,4 +1,5 @@
 using Common;
+using Board.Generator;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -77,7 +78,7 @@ namespace Engine.Render
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            _model = Matrix4.CreateTranslation(0.5f,0.0f,0.0f);
+            _model = Matrix4.Identity;
 
             _shader.Use();
 
@@ -87,10 +88,17 @@ namespace Engine.Render
             _shader.SetMatrix4("view", _view);
             _shader.SetMatrix4("projection", _projection);
 
+            var boardModel = BoardGenerator.GenerateTilesFrom(8,8);
+
             GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
             SwapBuffers();
         }
+
+        public void RenderFromBoardModel(Structures.Tile[,] board){
+            
+        }
+
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {

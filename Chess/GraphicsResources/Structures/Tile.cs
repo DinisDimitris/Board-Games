@@ -1,8 +1,14 @@
 using OpenTK.Mathematics;
-public class Tile {
-    public Matrix4 _identity;
-    public Tile(Matrix4 identity)
+
+namespace Structures
+{
+    public class Tile
     {
-        _identity = identity;
+        public Matrix4 _identity;
+        public Tile(Matrix4 identity)
+        {
+            _identity = identity;
+        }
     }
+
 }
