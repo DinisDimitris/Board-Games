@@ -60,16 +60,15 @@ namespace Engine.Render
             
             _elementBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
-            // We also upload data to the EBO the same way as we did with VBOs.
+
             GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
             
-            // The EBO has now been properly setup. Go to the Render function to see how we draw our rectangle now!
             _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
             _shader.Use();
 
-            _view = Matrix4.CreateTranslation(0.0f, 0.0f, -5.0f);
+            _view = Matrix4.CreateTranslation(0.5f, 0.5f, -0.0005f);
 
-            _projection  = Matrix4.CreateOrthographicOffCenter(0.0f , 10.0f, 0.0f , -10.0f, 0.1f, 100.0f);
+            _projection  = Matrix4.CreateOrthographicOffCenter(0.0f , 8.0f, 0.0f , 8.0f, -50.0f, 100.0f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
