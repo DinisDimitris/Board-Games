@@ -67,7 +67,7 @@ namespace Engine.Render
             _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
             _shader.Use();
 
-            _view = Matrix4.CreateTranslation(0.0f, 0.0f, -3.0f);
+            _view = Matrix4.CreateTranslation(0.0f, 0.0f, -15.0f);
 
             _projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), Size.X / (float)Size.Y, 0.1f, 100.0f);
         }
@@ -90,13 +90,21 @@ namespace Engine.Render
 
             var boardModel = BoardGenerator.GenerateTilesFrom(8,8);
 
-            GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+            RenderFromBoardModel(boardModel);
 
             SwapBuffers();
         }
 
         public void RenderFromBoardModel(Structures.Tile[,] board){
-            
+
+            for (int x = 0; x < board.GetLength(0); x++){
+                for(int y = 0; y < board.GetLength(1); y++){
+
+                    _shader.SetMatrix4("model", board[x,y].Identity);
+
+                    GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+                }
+            }
         }
 
 

@@ -4,10 +4,10 @@ namespace Structures
 {
     public class Tile
     {
-        public Matrix4 _identity;
+        public Matrix4 Identity;
         public Tile(Matrix4 identity)
         {
-            _identity = identity;
+            Identity = identity;
         }
     }
 
