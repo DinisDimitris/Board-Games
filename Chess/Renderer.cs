@@ -67,9 +67,9 @@ namespace Engine.Render
             _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
             _shader.Use();
 
-            _view = Matrix4.CreateTranslation(0.0f, 0.0f, -15.0f);
+            _view = Matrix4.CreateTranslation(0.0f, 0.0f, -5.0f);
 
-            _projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), Size.X / (float)Size.Y, 0.1f, 100.0f);
+            _projection  = Matrix4.CreateOrthographicOffCenter(0.0f , 10.0f, 0.0f , -10.0f, 0.1f, 100.0f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -88,7 +88,7 @@ namespace Engine.Render
             _shader.SetMatrix4("view", _view);
             _shader.SetMatrix4("projection", _projection);
 
-            var boardModel = BoardGenerator.GenerateTilesFrom(8,8);
+            var boardModel = BoardGenerator.GenerateBySize(8,8);
 
             RenderFromBoardModel(boardModel);
 
