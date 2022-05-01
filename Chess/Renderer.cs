@@ -13,10 +13,10 @@ namespace Engine.Render
     {
         private readonly float[] _vertices =
         {
-             0.45f,  0.45f, 0.0f, // top right
-             0.45f, -0.45f, 0.0f, // bottom right
-            -0.45f, -0.45f, 0.0f, // bottom left
-            -0.45f,  0.45f, 0.0f, // top left
+             0.50f,  0.50f, 0.0f, // top right
+             0.50f, -0.50f, 0.0f, // bottom right
+            -0.50f, -0.50f, 0.0f, // bottom left
+            -0.50f,  0.50f, 0.0f, // top left
         };
 
         private readonly uint[] _indices =
