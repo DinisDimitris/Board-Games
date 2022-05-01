@@ -13,7 +13,7 @@ namespace Board.Generator
 
             var position = Matrix4.Identity;
 
-            Vector4 color;
+            Vector3 color;
 
             for (int x = 0; x < rows; x++)
             {
@@ -23,11 +23,11 @@ namespace Board.Generator
                     //whites
                     if ((y % 2 == 0 && x % 2 == 0) | (y % 2 == 1 && x % 2 == 1))
                     {
-                        color = new Vector4(1, 1, 1, 1);
+                        color = new Vector3(1, 1, 1);
                     }
                     else
                     {
-                        color = new Vector4(0, 0, 0, 0);
+                        color = new Vector3(0, 0, 0);
                     }
 
                     board[x, y] = new Tile(position, color);

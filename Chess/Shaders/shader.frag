@@ -2,7 +2,9 @@
 
 out vec4 outputColor;
 
+uniform vec4 color; 
+
 void main()
 {
-    outputColor = vec4(1.0, 1.0, 0.0, 1.0);
+    outputColor = color;
 }
