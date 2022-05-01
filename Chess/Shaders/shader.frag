@@ -2,9 +2,9 @@
 
 out vec4 outputColor;
 
-uniform vec4 color; 
+uniform vec4 tileColour;
 
 void main()
 {
-    outputColor = color;
+    outputColor = tileColour;
 }

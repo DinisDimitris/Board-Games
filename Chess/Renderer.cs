@@ -21,8 +21,8 @@ namespace Engine.Render
 
         private readonly uint[] _indices =
         {
-            0, 1, 3, 
-            1, 2, 3 
+            0, 1, 3,
+            1, 2, 3
         };
 
         private int _vertexBufferObject;
@@ -57,18 +57,18 @@ namespace Engine.Render
 
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
-            
+
             _elementBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
 
             GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
-            
+
             _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
             _shader.Use();
 
             _view = Matrix4.CreateTranslation(0.5f, 0.5f, -0.0005f);
 
-            _projection  = Matrix4.CreateOrthographicOffCenter(0.0f , 8.0f, 0.0f , 8.0f, -0.1f, 100.0f);
+            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, 8.0f, 0.0f, 8.0f, -0.1f, 100.0f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -87,19 +87,23 @@ namespace Engine.Render
             _shader.SetMatrix4("view", _view);
             _shader.SetMatrix4("projection", _projection);
 
-            var boardModel = BoardGenerator.GenerateBySize(8,8);
+            var boardModel = BoardGenerator.GenerateBySize(8, 8);
 
             RenderFromBoardModel(boardModel);
 
             SwapBuffers();
         }
 
-        public void RenderFromBoardModel(Structures.Tile[,] board){
+        public void RenderFromBoardModel(Structures.Tile[,] board)
+        {
 
-            for (int x = 0; x < board.GetLength(0); x++){
-                for(int y = 0; y < board.GetLength(1); y++){
+            for (int x = 0; x < board.GetLength(0); x++)
+            {
+                for (int y = 0; y < board.GetLength(1); y++)
+                {
 
-                    _shader.SetMatrix4("model", board[x,y].Identity);
+                    _shader.SetMatrix4("model", board[x, y].Identity);
+                    _shader.SetVector4("tileColour", board[x, y].Color);
 
                     GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
                 }
