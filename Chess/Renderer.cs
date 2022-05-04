@@ -1,3 +1,4 @@
+using System;
 using Common;
 using Board.Generator;
 using OpenTK.Graphics.OpenGL4;
@@ -68,7 +69,7 @@ namespace Engine.Render
 
             _view = Matrix4.CreateTranslation(0.5f, 0.5f, -0.0005f);
 
-            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, 8.0f, 0.0f, 8.0f, -0.1f, 100.0f);
+            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, 8.0f, 0.0f, 8.0f, -0.1f, 1.0f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -108,6 +109,16 @@ namespace Engine.Render
                     GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
                 }
             }
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+
+            var x = MouseState.Position.X;
+            var y = MouseState.Position.Y;
+
+            Console.WriteLine(MouseState.Position);
         }
 
 
