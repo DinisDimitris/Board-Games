@@ -114,11 +114,13 @@ namespace Engine.Render
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
+            var vec4 = new Vector4(MouseState.Position.X / Size.X, MouseState.Position.Y / Size.Y,0,1);
 
-            var x = MouseState.Position.X;
-            var y = MouseState.Position.Y;
+            var inverse = Matrix4.Identity;
+            Matrix4.Invert(_view, out inverse);
 
-            Console.WriteLine(MouseState.Position);
+            var outp = vec4 * inverse;
+            Console.WriteLine(outp.X + " " + outp.Y);
         }
 
 

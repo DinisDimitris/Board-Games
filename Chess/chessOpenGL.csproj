@@ -8,5 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="OpenTK" Version="4.7.2" />
+    <PackageReference Include="OpenTK.redist.glfw" Version="3.3.7.27" />
   </ItemGroup>
 </Project>
