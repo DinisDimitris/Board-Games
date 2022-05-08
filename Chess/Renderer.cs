@@ -122,9 +122,12 @@ namespace Engine.Render
             {
                 Close();
             }
-            var newY = -1 * MouseState.Position.Y + 600;
-                Console.WriteLine("Y: " + newY );
-                Console.WriteLine("X: " + MouseState.Position.X );
+            var flippedY = -1 * MouseState.Position.Y + Size.Y;
+
+            var scaledX = MouseState.Position.X == 0 ? MouseState.Position.X : MouseState.Position.X / 100;
+            var scaledY = flippedY == 0 ? flippedY: flippedY / 100; 
+
+                Console.WriteLine((int) scaledX + " " + ((int)scaledY) );
         }
 
         protected override void OnResize(ResizeEventArgs e)
