@@ -102,26 +102,14 @@ namespace Engine.Render
             {
                 for (int y = 0; y < board.GetLength(1); y++)
                 {
-
+                    var m = Size;
                     _shader.SetMatrix4("model", board[x, y].Identity);
                     _shader.SetVector4("tileColour", board[x, y].Color);
 
                     GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
                 }
             }
-        }
-
-        protected override void OnMouseDown(MouseButtonEventArgs e)
-        {
-            base.OnMouseDown(e);
-            var vec4 = new Vector4(MouseState.Position.X / Size.X, MouseState.Position.Y / Size.Y,0,1);
-
-            var inverse = Matrix4.Identity;
-            Matrix4.Invert(_view, out inverse);
-
-            var outp = vec4 * inverse;
-            Console.WriteLine(outp.X + " " + outp.Y);
-        }
+            }
 
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -134,6 +122,9 @@ namespace Engine.Render
             {
                 Close();
             }
+            var newY = -1 * MouseState.Position.Y + 600;
+                Console.WriteLine("Y: " + newY );
+                Console.WriteLine("X: " + MouseState.Position.X );
         }
 
         protected override void OnResize(ResizeEventArgs e)
