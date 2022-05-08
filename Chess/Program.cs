@@ -9,7 +9,7 @@ public static class Program
     {
         var nativeWindowSettings = new NativeWindowSettings()
         {
-            Size = new Vector2i(1024, 768),
+            Size = new Vector2i(800, 600),
             Title = "Chess",
             // This is needed to run on macos
             Flags = ContextFlags.ForwardCompatible,
