@@ -69,7 +69,7 @@ namespace Engine.Render
 
             _view = Matrix4.CreateTranslation(0.5f, 0.5f, -0.0005f);
 
-            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, 8.0f, 0.0f, 12.0f, -0.1f, 1.0f);
+            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, 8.0f, 0.0f, 8.0f, -0.1f, 1.0f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -124,9 +124,9 @@ namespace Engine.Render
             var flippedY = -1 * MouseState.Position.Y + Size.Y;
 
             var scaledX = MouseState.Position.X == 0 ? MouseState.Position.X: (MouseState.Position.X / 100);
-            var scaledY = flippedY == 0 ? flippedY: flippedY / 100; 
+            var scaledY = flippedY == 0 ? flippedY : flippedY / 100; 
 
-                Console.WriteLine( scaledX + " " + scaledY );
+                Console.WriteLine( (int)scaledX + " " + (int)scaledY );
         }
 
         protected override void OnResize(ResizeEventArgs e)
