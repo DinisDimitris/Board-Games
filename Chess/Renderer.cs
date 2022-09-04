@@ -12,14 +12,6 @@ namespace Engine.Render
 {
     public class Renderer : GameWindow
     {
-        private readonly float[] _vertices =
-        {
-             0.50f,  0.50f, 0.0f, // top right
-             0.50f, -0.50f, 0.0f, // bottom right
-            -0.50f, -0.50f, 0.0f, // bottom left
-            -0.50f,  0.50f, 0.0f, // top left
-        };
-
         private readonly uint[] _indices =
         {
             0, 1, 3,
@@ -47,14 +39,22 @@ namespace Engine.Render
         {
             base.OnLoad();
 
-            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            var vertices = new float[]
+            {
+                Size.X / 100.0f,  Size.Y / 100.0f, 0.0f, // top right
+                Size.X / 100.0f, -Size.Y / 100.0f, 0.0f, // bottom right
+                -Size.X / 100.0f, -Size.Y / 100.0f, 0.0f, // bottom left
+                -Size.X / 100.0f,  Size.Y / 100.0f, 0.0f, // top left
+            };
 
-            _vertexBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
             _vertexArrayObject = GL.GenVertexArray();
             GL.BindVertexArray(_vertexArrayObject);
+
+            _vertexBufferObject = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
 
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
@@ -67,9 +67,9 @@ namespace Engine.Render
             _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
             _shader.Use();
 
-            _view = Matrix4.CreateTranslation(0.5f, 0.5f, -0.0005f);
+            _view = Matrix4.CreateTranslation(Size.X / 100.0f, Size.Y / 100.0f, -0.0005f);
 
-            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, 8.0f, 0.0f, 8.0f, -0.1f, 1.0f);
+            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, Size.X / 100.0f, 0.0f, Size.Y / 100.0f, -0.1f, 1.0f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -125,13 +125,26 @@ namespace Engine.Render
 
             var scaledX = MouseState.Position.X == 0 ? MouseState.Position.X: (MouseState.Position.X / 100);
             var scaledY = flippedY == 0 ? flippedY : flippedY / 100; 
-
-                Console.WriteLine( (int)scaledX + " " + (int)scaledY );
         }
 
         protected override void OnResize(ResizeEventArgs e)
         {
             base.OnResize(e);
+
+            var vertices = new float[]
+            {
+                Size.X / 100.0f,  Size.Y / 100.0f, 0.0f, // top right
+                Size.X / 100.0f, -Size.Y / 100.0f, 0.0f, // bottom right
+                -Size.X / 100.0f, -Size.Y / 100.0f, 0.0f, // bottom left
+                -Size.X / 100.0f,  Size.Y / 100.0f, 0.0f, // top left
+            };
+
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
+
+            _view = Matrix4.CreateTranslation(Size.X / 100.0f, Size.Y / 100.0f, -0.0005f);
+
+            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, Size.X / 100.0f, 0.0f, Size.Y / 100.0f, -0.1f, 1.0f);
+
             GL.Viewport(0, 0, Size.X, Size.Y);
         }
     }
