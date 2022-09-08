@@ -1,6 +1,7 @@
 using System;
 using Common;
-using Board.Generator;
+using Structures.Grid;
+using Structures.Tiles;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -83,14 +84,14 @@ namespace Engine.Render
             _shader.SetMatrix4("view", _view);
             _shader.SetMatrix4("projection", _projection);
 
-            var boardModel = BoardGenerator.GenerateBySize(8, 8);
+            var boardModel = GridGenerator.GenerateBySize(8, 8);
 
             RenderFromBoardModel(boardModel);
 
             SwapBuffers();
         }
 
-        public void RenderFromBoardModel(Structures.Tile[,] board)
+        public void RenderFromBoardModel(Tile[,] board)
         {
             for (int x = 0; x < board.GetLength(0); x++)
             {

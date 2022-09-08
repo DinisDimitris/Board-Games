@@ -1,9 +1,9 @@
-using Structures;
+using Structures.Tiles;
 using OpenTK.Mathematics;
 
-namespace Board.Generator
+namespace Structures.Grid
 {
-    public static class BoardGenerator
+    public static class GridGenerator
     {
 
         public static Tile[,] GenerateBySize(int rows, int columns)

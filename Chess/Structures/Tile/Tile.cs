@@ -1,6 +1,6 @@
 using OpenTK.Mathematics;
 
-namespace Structures
+namespace Structures.Tiles
 {
     public class Tile
     {
