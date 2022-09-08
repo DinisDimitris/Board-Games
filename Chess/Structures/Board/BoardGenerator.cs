@@ -5,7 +5,6 @@ namespace Structures.Grid
 {
     public static class GridGenerator
     {
-
         public static Tile[,] GenerateBySize(int rows, int columns)
         {
 
