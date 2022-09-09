@@ -24,7 +24,7 @@ namespace Structures.Tiles
         public TileRenderer(Vector2 screenSize)
         {
             _screenSize = screenSize;
-            _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");;
+            _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag"); ;
         }
         public void LoadVertexBuffers()
         {
@@ -63,48 +63,25 @@ namespace Structures.Tiles
         {
             _shader.SetMatrix4("view", view);
         }
-        
+
         public void SetProjection(Matrix4 projection)
         {
             _shader.SetMatrix4("projection", projection);
         }
 
-        public Tile[,] RenderBoard()
+        public void RenderBoard(Tile[,] board)
         {
-            BindVertexArray();
-
-            var board = new Tile[8, 8];
-
-            var position = Matrix4.Identity;
-
-            Vector4 color;
-
-            for (int x = 0; x < 8; x++)
+            for (int x = 0; x < board.GetLength(0); x++)
             {
-                for (int y = 0; y < 8; y++)
+                for (int y = 0; y < board.GetLength(1); y++)
                 {
-                    position = Matrix4.CreateTranslation(x, y, 0);
-
-                    //whites
-                    if ((y % 2 == 0 && x % 2 == 0) | (y % 2 == 1 && x % 2 == 1))
-                    {
-                        color = new Vector4(1, 1, 1,1);
-                    }
-                    else
-                    {
-                        color = new Vector4(0, 0, 0, 0);
-                    }
-
-                    board[x, y] = new Tile(position, color);
-
                     _shader.SetVector3("offset", new Vector3(x * _screenSize.X / 8, y * _screenSize.Y / 8, 1));
                     _shader.SetVector4("tileColour", board[x, y].Color);
+
 
                     GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
                 }
             }
-
-            return board;
         }
 
         public void ResizeBoard(Vector2 Size)
@@ -122,6 +99,11 @@ namespace Structures.Tiles
             GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
         }
 
+        public void Render()
+        {
+            GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+        }
+
         public void SetTileColour(Vector4 colour)
         {
             _shader.Use();
@@ -129,6 +111,8 @@ namespace Structures.Tiles
             _shader.SetVector4("tileColour", colour);
 
             GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+
+            GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
         }
 
         public void BindVertexArray()

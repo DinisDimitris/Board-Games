@@ -1,13 +1,13 @@
 using System;
-using Common;
 using Structures.Tiles;
+using Structures.Boards;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
-namespace Engine.Board
+namespace Engine.Window
 {
     public class Window : GameWindow
     {
@@ -26,6 +26,8 @@ namespace Engine.Board
             _tileRenderer = new TileRenderer(Size);
 
             _tileRenderer.LoadVertexBuffers();
+
+            _board = Board.GenerateBoard();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -38,7 +40,7 @@ namespace Engine.Board
             _tileRenderer.SetView(Matrix4.CreateTranslation(Size.X / 8, Size.Y / 8, -0.0005f));
             _tileRenderer.SetProjection(Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, 0.0f, Size.Y, -0.1f, 1.0f));
 
-            _board = _tileRenderer.RenderBoard();
+            _tileRenderer.RenderBoard(_board);
 
             SwapBuffers();
         }
@@ -54,7 +56,7 @@ namespace Engine.Board
                 Close();
             }
 
-            var mousePosition = MouseState.Position;
+               var mousePosition = MouseState.Position;
 
             var flippedY = -1 * mousePosition.Y + Size.Y;
 
