@@ -1,7 +1,6 @@
 using OpenTK.Mathematics;
-using Structures.Tiles;
 
-namespace Structures.Boards
+namespace Structures
 {
     public static class Board
     {

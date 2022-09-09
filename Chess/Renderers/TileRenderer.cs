@@ -1,8 +1,9 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using Common;
+using Structures;
 
-namespace Structures.Tiles
+namespace Renderers
 {
     public class TileRenderer
     {

@@ -1,6 +1,6 @@
 using System;
-using Structures.Tiles;
-using Structures.Boards;
+using Structures;
+using Renderers;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
