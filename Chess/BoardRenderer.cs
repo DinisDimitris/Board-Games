@@ -7,19 +7,16 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
-namespace Engine.Render
-
+namespace Engine.Board
 {
-    public class Renderer : GameWindow
+    public class BoardRenderer : GameWindow
     {
         private TileRenderer _tileRenderer;
         private Shader _shader;
         private Matrix4 _view;
         private Matrix4 _projection;
 
-    
-
-        public Renderer(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
+        public BoardRenderer(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
             : base(gameWindowSettings, nativeWindowSettings)
         {
         }
@@ -28,10 +25,9 @@ namespace Engine.Render
         {
             base.OnLoad();
 
-            _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
             _shader.Use();
 
-            _tileRenderer = new TileRenderer(Size, _shader);
+            _tileRenderer = new TileRenderer(Size);
 
             _tileRenderer.LoadVertexBuffers();
 

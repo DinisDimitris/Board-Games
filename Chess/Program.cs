@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using Engine.Render;
+using Engine.Board;
 
 public static class Program
 {
@@ -15,7 +15,7 @@ public static class Program
             Flags = ContextFlags.ForwardCompatible,
         };
 
-        using (var window = new Renderer(GameWindowSettings.Default, nativeWindowSettings))
+        using (var window = new BoardRenderer(GameWindowSettings.Default, nativeWindowSettings))
         {
             window.Run();
         }
