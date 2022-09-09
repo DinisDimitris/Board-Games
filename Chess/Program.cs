@@ -15,7 +15,7 @@ public static class Program
             Flags = ContextFlags.ForwardCompatible,
         };
 
-        using (var window = new Renderer(GameWindowSettings.Default, nativeWindowSettings))
+        using (var window = new Window(GameWindowSettings.Default, nativeWindowSettings))
         {
             window.Run();
         }

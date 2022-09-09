@@ -6,28 +6,29 @@ namespace Structures.Tiles
 {
     public class TileRenderer
     {
-        public readonly uint[] Indices =
+        private readonly uint[] _indices =
         {
             0, 1, 3,
             1, 2, 3
         };
 
-        public int VertexBufferObject;
+        public float[] _vertices;
+        private int _vertexBufferObject;
 
-        public int VertexArrayObject;
+        private int _vertexArrayObject;
 
-        private int ElementBufferObject;
+        private int _elementBufferObject;
         private Vector2 _screenSize;
 
         private Shader _shader;
-        public TileRenderer(Vector2 screenSize, Shader shader)
+        public TileRenderer(Vector2 screenSize)
         {
             _screenSize = screenSize;
-            _shader = shader;
+            _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");;
         }
         public void LoadVertexBuffers()
         {
-            var vertices = new float[]
+            _vertices = new float[]
             {
                 _screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, // top right
                 _screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, // bottom right
@@ -37,20 +38,35 @@ namespace Structures.Tiles
 
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-            VertexArrayObject = GL.GenVertexArray();
+            _vertexArrayObject = GL.GenVertexArray();
             BindVertexArray();
 
-            VertexBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
+            _vertexBufferObject = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
 
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-            ElementBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
+            _elementBufferObject = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
 
-            GL.BufferData(BufferTarget.ElementArrayBuffer, Indices.Length * sizeof(uint), Indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
+        }
+
+        public void LoadShader()
+        {
+            _shader.Use();
+        }
+
+        public void SetView(Matrix4 view)
+        {
+            _shader.SetMatrix4("view", view);
+        }
+        
+        public void SetProjection(Matrix4 projection)
+        {
+            _shader.SetMatrix4("projection", projection);
         }
 
         public Tile[,] RenderBoard()
@@ -84,7 +100,7 @@ namespace Structures.Tiles
                     _shader.SetVector3("offset", new Vector3(x * _screenSize.X / 8, y * _screenSize.Y / 8, 1));
                     _shader.SetVector4("tileColour", board[x, y].Color);
 
-                    GL.DrawElements(PrimitiveType.Triangles, Indices.Length, DrawElementsType.UnsignedInt, 0);
+                    GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
                 }
             }
 
@@ -95,7 +111,7 @@ namespace Structures.Tiles
         {
             _screenSize = Size;
 
-            var vertices = new float[]
+            _vertices = new float[]
             {
                 Size.X / 8.0f,  Size.Y / 8.0f, 0.0f, // top right
                 Size.X / 8.0f, -Size.Y / 8.0f, 0.0f, // bottom right
@@ -103,12 +119,21 @@ namespace Structures.Tiles
                 -Size.X / 8.0f,  Size.Y / 8.0f, 0.0f, // top left
             };
 
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+        }
+
+        public void SetTileColour(Vector4 colour)
+        {
+            _shader.Use();
+
+            _shader.SetVector4("tileColour", colour);
+
+            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
         }
 
         public void BindVertexArray()
         {
-            GL.BindVertexArray(VertexArrayObject);
+            GL.BindVertexArray(_vertexArrayObject);
         }
     }
 
