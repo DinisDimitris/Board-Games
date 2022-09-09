@@ -11,7 +11,11 @@ namespace Engine.Window
 {
     public class Window : GameWindow
     {
-        private TileRenderer _tileRenderer;
+        private static TileRenderer _tileRenderer;
+        private static bool _moveChosen = false;
+
+        private Vector4 _clickColor = new Vector4(0.9f, 0.6f, 0.4f, 1.0f);
+        private Tile _tempTile;
         private Tile[,] _board;
 
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
@@ -28,6 +32,8 @@ namespace Engine.Window
             _tileRenderer.LoadVertexBuffers();
 
             _board = Board.GenerateBoard();
+
+            _tempTile = new Tile(new Vector2(1,1), new Vector4(1,1,1,1));
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -56,7 +62,7 @@ namespace Engine.Window
                 Close();
             }
 
-               var mousePosition = MouseState.Position;
+            var mousePosition = MouseState.Position;
 
             var flippedY = -1 * mousePosition.Y + Size.Y;
 
@@ -71,9 +77,23 @@ namespace Engine.Window
             {
                 if (MouseState.IsButtonPressed(MouseButton.Left))
                 {
-                    _board[x,y].Color = new Vector4(1,1,1,1);
-                    _tileRenderer.SetTileColour(_board[x,y].Color);
+                    if (!_moveChosen)
+                    {
+                        _tempTile.Identity = _board[x,y].Identity;
+                        _tempTile.Color = _board[x, y].Color;
 
+                        _board[x, y].Color = _clickColor;
+
+                        _moveChosen = true;
+                    }
+                    else
+                    {
+                        _board[(int)_tempTile.Identity.X, (int)_tempTile.Identity.Y].Color = _tempTile.Color;
+                        _moveChosen = false;
+                    }
+
+
+                    _tileRenderer.SetTileColours(_board[x, y].Color);
                     Console.WriteLine(mousePositionOnGameScreen.X + " " + mousePositionOnGameScreen.Y);
                 }
             }

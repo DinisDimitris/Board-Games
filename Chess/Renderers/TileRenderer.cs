@@ -100,12 +100,7 @@ namespace Renderers
             GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
         }
 
-        public void Render()
-        {
-            GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
-        }
-
-        public void SetTileColour(Vector4 colour)
+        public void SetTileColours(Vector4 colour)
         {
             _shader.Use();
 

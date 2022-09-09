@@ -8,15 +8,13 @@ namespace Structures
         {
             var board = new Tile[8,8];
 
-            var position = Matrix4.Identity;
-
             Vector4 color;
 
             for (int x = 0; x < 8; x++)
             {
                 for (int y = 0; y < 8; y++)
                 {
-                    position = Matrix4.CreateTranslation(x, y, 0);
+                    var position = new Vector2(x,y);
 
                     //whites
                     if ((y % 2 == 0 && x % 2 == 0) | (y % 2 == 1 && x % 2 == 1))
@@ -34,6 +32,5 @@ namespace Structures
 
             return board;
         }
-
     }
 }
