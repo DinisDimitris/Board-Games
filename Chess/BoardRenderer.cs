@@ -9,14 +9,16 @@ using OpenTK.Mathematics;
 
 namespace Engine.Board
 {
-    public class BoardRenderer : GameWindow
+    public class Renderer : GameWindow
     {
         private TileRenderer _tileRenderer;
         private Shader _shader;
         private Matrix4 _view;
         private Matrix4 _projection;
 
-        public BoardRenderer(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
+        private Tile[,] _board;
+
+        public Renderer(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
             : base(gameWindowSettings, nativeWindowSettings)
         {
         }
@@ -25,15 +27,16 @@ namespace Engine.Board
         {
             base.OnLoad();
 
+            _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
             _shader.Use();
 
-            _tileRenderer = new TileRenderer(Size);
+            _tileRenderer = new TileRenderer(Size, _shader);
 
             _tileRenderer.LoadVertexBuffers();
 
-            _view = Matrix4.CreateTranslation(Size.X / 8 , Size.Y / 8, -0.0005f);
+            _view = Matrix4.CreateTranslation(Size.X / 8, Size.Y / 8, -0.0005f);
 
-            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, 0.0f, Size.Y , -0.1f, 1.0f);
+            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, 0.0f, Size.Y, -0.1f, 1.0f);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -47,7 +50,7 @@ namespace Engine.Board
             _shader.SetMatrix4("view", _view);
             _shader.SetMatrix4("projection", _projection);
 
-            var board = _tileRenderer.RenderBoard();
+            _board = _tileRenderer.RenderBoard();
 
             SwapBuffers();
         }
@@ -56,19 +59,28 @@ namespace Engine.Board
         {
             base.OnUpdateFrame(e);
 
-            var input = KeyboardState;
+            var keyboardInput = KeyboardState;
 
-            if (input.IsKeyDown(Keys.Escape))
+            if (keyboardInput.IsKeyDown(Keys.Escape))
             {
                 Close();
             }
 
-            var flippedY = -1 * MouseState.Position.Y + Size.Y;
+            var mousePosition = MouseState.Position;
+
+            var flippedY = -1 * mousePosition.Y + Size.Y;
 
             var tileUnit = new Vector2(Size.X / 8.0f, Size.Y / 8.0f);
 
-            var mousePositionPerTile = new Vector2(MouseState.Position.X / tileUnit.X, flippedY / tileUnit.Y);
-            Console.WriteLine((mousePositionPerTile.X + " " + mousePositionPerTile.Y));
+            var pos = new Vector2((int)(mousePosition.X / tileUnit.X + 1), (int)(flippedY / tileUnit.Y + 1));
+
+            if (pos.X >= 1 && pos.X <= 8 && pos.Y >= 1 && pos.Y <= 8)
+            {
+                if (MouseState.IsButtonPressed(MouseButton.Left))
+                {
+                    Console.WriteLine(pos.X + " " + pos.Y);
+                }
+            }
         }
 
         protected override void OnResize(ResizeEventArgs e)
@@ -77,9 +89,9 @@ namespace Engine.Board
 
             _tileRenderer.ResizeBoard(Size);
 
-            _view = Matrix4.CreateTranslation(Size.X / 8 , Size.Y / 8, -0.0005f);
+            _view = Matrix4.CreateTranslation(Size.X / 8, Size.Y / 8, -0.0005f);
 
-            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, 0.0f, Size.Y , -0.1f, 1.0f);
+            _projection = Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, 0.0f, Size.Y, -0.1f, 1.0f);
 
             GL.Viewport(0, 0, Size.X, Size.Y);
         }

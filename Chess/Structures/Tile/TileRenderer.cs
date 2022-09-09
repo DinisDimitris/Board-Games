@@ -20,10 +20,10 @@ namespace Structures.Tiles
         private Vector2 _screenSize;
 
         private Shader _shader;
-        public TileRenderer(Vector2 screenSize)
+        public TileRenderer(Vector2 screenSize, Shader shader)
         {
             _screenSize = screenSize;
-            _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+            _shader = shader;
         }
         public void LoadVertexBuffers()
         {
@@ -51,11 +51,6 @@ namespace Structures.Tiles
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
 
             GL.BufferData(BufferTarget.ElementArrayBuffer, Indices.Length * sizeof(uint), Indices, BufferUsageHint.StaticDraw);
-        }
-
-        public void LoadShader()
-        {
-            _shader.Use();
         }
 
         public Tile[,] RenderBoard()
