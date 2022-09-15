@@ -9,14 +9,14 @@ using OpenTK.Mathematics;
 
 namespace Engine.Window
 {
-    public class Window : GameWindow
+    public sealed class Window : GameWindow
     {
-        private static TileRenderer _tileRenderer;
+        private static Renderer _renderer;
         private static bool _moveChosen = false;
 
-        private Vector4 _clickColor = new Vector4(0.9f, 0.6f, 0.4f, 1.0f);
-        private Tile _tempTile;
-        private Tile[,] _board;
+        private static Vector4 _clickColor = new Vector4(0.9f, 0.6f, 0.4f, 1.0f);
+        private static Tile _tempTile;
+        private static Tile[,] _board;
 
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
             : base(gameWindowSettings, nativeWindowSettings)
@@ -27,11 +27,13 @@ namespace Engine.Window
         {
             base.OnLoad();
 
-            _tileRenderer = new TileRenderer(Size);
+            _renderer = new Renderer(Size);
 
-            _tileRenderer.LoadVertexBuffers();
+            _renderer.LoadVertexBuffers();
 
             _board = Board.GenerateBoard();
+
+            _board[5,5].Piece = new Piece(new Vector2(5,5), new Vector4(0,1,0,1));
 
             _tempTile = new Tile(new Vector2(1,1), new Vector4(1,1,1,1));
         }
@@ -42,11 +44,11 @@ namespace Engine.Window
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            _tileRenderer.LoadShader();
-            _tileRenderer.SetView(Matrix4.CreateTranslation(Size.X / 8, Size.Y / 8, -0.0005f));
-            _tileRenderer.SetProjection(Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, 0.0f, Size.Y, -0.1f, 1.0f));
+            _renderer.UseShader();
+            _renderer.SetView(Matrix4.CreateTranslation(Size.X / 8, Size.Y / 8, -0.0005f));
+            _renderer.SetProjection(Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, 0.0f, Size.Y, -0.1f, 1.0f));
 
-            _tileRenderer.RenderBoard(_board);
+            _renderer.RenderBoard(_board);
 
             SwapBuffers();
         }
@@ -92,8 +94,7 @@ namespace Engine.Window
                         _moveChosen = false;
                     }
 
-
-                    _tileRenderer.SetTileColours(_board[x, y].Color);
+                    _renderer.SetTileColours(_board[x, y].Color);
                     Console.WriteLine(mousePositionOnGameScreen.X + " " + mousePositionOnGameScreen.Y);
                 }
             }
@@ -103,10 +104,10 @@ namespace Engine.Window
         {
             base.OnResize(e);
 
-            _tileRenderer.ResizeBoard(Size);
+            _renderer.ResizeBoard(Size);
 
-            _tileRenderer.SetView(Matrix4.CreateTranslation(Size.X / 8, Size.Y / 8, -0.0005f));
-            _tileRenderer.SetProjection(Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, 0.0f, Size.Y, -0.1f, 1.0f));
+            _renderer.SetView(Matrix4.CreateTranslation(Size.X / 8, Size.Y / 8, -0.0005f));
+            _renderer.SetProjection(Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, 0.0f, Size.Y, -0.1f, 1.0f));
 
             GL.Viewport(0, 0, Size.X, Size.Y);
         }

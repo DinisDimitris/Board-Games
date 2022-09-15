@@ -2,13 +2,11 @@ using OpenTK.Mathematics;
 
 namespace Structures
 {
-    public sealed class Tile
+    public sealed class Piece
     {
         public Vector2 Identity;
         public Vector4 Color;
-
-        public Piece Piece {get; set;}
-        public Tile(Vector2 identity, Vector4 color)
+        public Piece(Vector2 identity, Vector4 color)
         {
             Color = color;
             Identity = identity;

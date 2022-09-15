@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 
 namespace Common
 {
-    public class Shader
+    public sealed class Shader
     {
         public readonly int Handle;
 

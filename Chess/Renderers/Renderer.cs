@@ -5,7 +5,7 @@ using Structures;
 
 namespace Renderers
 {
-    public class TileRenderer
+    public sealed class Renderer
     {
         private readonly uint[] _indices =
         {
@@ -22,7 +22,7 @@ namespace Renderers
         private Vector2 _screenSize;
 
         private Shader _shader;
-        public TileRenderer(Vector2 screenSize)
+        public Renderer(Vector2 screenSize)
         {
             _screenSize = screenSize;
             _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag"); ;
@@ -55,7 +55,7 @@ namespace Renderers
             GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
         }
 
-        public void LoadShader()
+        public void UseShader()
         {
             _shader.Use();
         }
@@ -72,13 +72,39 @@ namespace Renderers
 
         public void RenderBoard(Tile[,] board)
         {
-            for (int x = 0; x < board.GetLength(0); x++)
-            {
-                for (int y = 0; y < board.GetLength(1); y++)
+            foreach (var tile in board)
+            { _vertices = new float[]
                 {
-                    _shader.SetVector3("offset", new Vector3(x * _screenSize.X / 8, y * _screenSize.Y / 8, 1));
-                    _shader.SetVector4("tileColour", board[x, y].Color);
+                    _screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, // top right
+                    _screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, // bottom right
+                    -_screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, // bottom left
+                    -_screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, // top left
+                };
 
+                GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+                _shader.SetVector3("offset", new Vector3(tile.Identity.X * _screenSize.X / 8, tile.Identity.Y * _screenSize.Y / 8, 1));
+                SetProjection(Matrix4.CreateOrthographicOffCenter(0.0f, _screenSize.X, 0.0f, _screenSize.Y, -0.1f, 1.0f));
+                SetView(Matrix4.CreateTranslation(_screenSize.X / 8, _screenSize.Y / 8, -0.0005f));
+                _shader.SetVector4("tileColour", tile.Color);
+
+                GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+
+                if (tile.Piece != null)
+                {
+                    _vertices = new float[]
+                    {
+                        (_screenSize.X - 100.0f)/ 8.0f,  (_screenSize.Y - 100.0f)/ 8.0f, 0.0f, // top right
+                        (_screenSize.X - 100.0f)/ 8.0f, (-_screenSize.Y + 100.0f)/ 8.0f, 0.0f, // bottom right
+                        (-_screenSize.X + 100.0f) / 8.0f, (-_screenSize.Y + 100.0f) / 8.0f, 0.0f, // bottom left
+                        (-_screenSize.X + 100.0f) / 8.0f,  (_screenSize.Y - 100.0f)/ 8.0f, 0.0f, // top left
+                    };
+
+                    GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+
+                    SetView(Matrix4.CreateTranslation((_screenSize.X - 100.0f)/ 8 , (_screenSize.Y- 100.0f) / 8, -0.0005f));
+                    SetProjection(Matrix4.CreateOrthographicOffCenter(0.0f, (_screenSize.X + 100.0f), 0.0f, (_screenSize.Y + 100.0f), -0.1f, 1.0f));
+                    _shader.SetVector3("offset", new Vector3(tile.Piece.Identity.X * _screenSize.X / 8, tile.Piece.Identity.Y * _screenSize.Y / 8, 1));
+                    _shader.SetVector4("tileColour", tile.Piece.Color);
 
                     GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
                 }
@@ -88,16 +114,6 @@ namespace Renderers
         public void ResizeBoard(Vector2 Size)
         {
             _screenSize = Size;
-
-            _vertices = new float[]
-            {
-                Size.X / 8.0f,  Size.Y / 8.0f, 0.0f, // top right
-                Size.X / 8.0f, -Size.Y / 8.0f, 0.0f, // bottom right
-                -Size.X / 8.0f, -Size.Y / 8.0f, 0.0f, // bottom left
-                -Size.X / 8.0f,  Size.Y / 8.0f, 0.0f, // top left
-            };
-
-            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
         }
 
         public void SetTileColours(Vector4 colour)
@@ -116,5 +132,4 @@ namespace Renderers
             GL.BindVertexArray(_vertexArrayObject);
         }
     }
-
 }
