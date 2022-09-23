@@ -27,7 +27,7 @@ namespace Renderers
         public Renderer(Vector2 screenSize)
         {
             _screenSize = screenSize;
-            _shader = new Shader("Shaders/shader.vert", "Shaders/texshader.frag");
+            _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
             _texture = Texture.LoadFromFile("Textures/test.png");
         }
         public void LoadVertexBuffers()
