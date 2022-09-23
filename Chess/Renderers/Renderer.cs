@@ -22,19 +22,22 @@ namespace Renderers
         private Vector2 _screenSize;
 
         private Shader _shader;
+
+        private Texture _texture;
         public Renderer(Vector2 screenSize)
         {
             _screenSize = screenSize;
-            _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag"); ;
+            _shader = new Shader("Shaders/shader.vert", "Shaders/texshader.frag");
+            _texture = Texture.LoadFromFile("Textures/test.png");
         }
         public void LoadVertexBuffers()
         {
             _vertices = new float[]
             {
-                _screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, // top right
-                _screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, // bottom right
-                -_screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, // bottom left
-                -_screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, // top left
+                _screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, 0.80f, 1.0f, // top right
+                _screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, 0.80f, 0.0f, // bottom right
+                -_screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, 0.0f, 0.0f, // bottom left
+                -_screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, 0.0f, 1.0f, // top left
             };
 
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -46,18 +49,28 @@ namespace Renderers
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
 
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-            GL.EnableVertexAttribArray(0);
-
             _elementBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
 
             GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
+
+            var vertexLocation = _shader.GetAttribLocation("aPosition");
+            GL.EnableVertexAttribArray(vertexLocation);
+            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
+
+            var texCoordLocation = _shader.GetAttribLocation("aTexCoord");
+            GL.EnableVertexAttribArray(texCoordLocation);
+            GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
         }
 
         public void UseShader()
         {
             _shader.Use();
+        }
+
+        public void UseTexture()
+        {
+            _texture.Use();
         }
 
         public void SetView(Matrix4 view)
@@ -72,17 +85,18 @@ namespace Renderers
 
         public void RenderBoard(Tile[,] board)
         {
+            _vertices = new float[]
+            {
+                _screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, 1.0f, 1.0f, // top right
+                _screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, 1.0f, 0.0f, // bottom right
+                -_screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, 0.0f, 0.0f, // bottom left
+                -_screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, 0.0f, 1.0f, // top left
+            };
+
+            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+
             foreach (var tile in board)
-
-            { _vertices = new float[]
-                {
-                    _screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, // top right
-                    _screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, // bottom right
-                    -_screenSize.X / 8.0f, -_screenSize.Y / 8.0f, 0.0f, // bottom left
-                    -_screenSize.X / 8.0f,  _screenSize.Y / 8.0f, 0.0f, // top left
-                };
-
-                GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+            {
                 _shader.SetVector3("offset", new Vector3(tile.Identity.X * _screenSize.X / 8, tile.Identity.Y * _screenSize.Y / 8, 1));
                 _shader.SetVector4("tileColour", tile.Color);
 
