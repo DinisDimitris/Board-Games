@@ -107,6 +107,13 @@ namespace Renderers
                     GL.Uniform1(activeTextureLocation, -1); // No texture is active
                 }
 
+                Matrix4 modelMatrix = Matrix4.CreateTranslation(new Vector3(_screenSize.X / 8.0f , _screenSize.Y / 8.0f, 0.0f));
+                modelMatrix *= Matrix4.CreateScale(new Vector3(2.0f, 2.0f, 1.0f)); // Example scaling, adjust as needed
+
+                int modelMatrixLocation = GL.GetUniformLocation(_shader.Handle, "modelMatrix");
+                GL.UniformMatrix4(modelMatrixLocation, false, ref modelMatrix);
+
+
                 _shader.SetVector3("offset", new Vector3(tile.Identity.X * _screenSize.X / 8, tile.Identity.Y * _screenSize.Y / 8, 1));
                 _shader.SetVector4("tileColour", tile.Color);
 
