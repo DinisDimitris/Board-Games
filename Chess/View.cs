@@ -35,7 +35,7 @@ namespace Engine.Window
 
             _board[5,5].Piece = new Piece(new Vector4(0,1,0,1));
 
-            _tempTile = new Tile(new Vector2(1,1), new Vector4(1,1,1,1));
+            _tempTile = new Tile(new Vector2(1,1), new Vector4(1,1,1,1), "test.png");
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)

@@ -22,13 +22,10 @@ namespace Renderers
         private Vector2 _screenSize;
 
         private Shader _shader;
-
-        private Texture _texture;
         public Renderer(Vector2 screenSize)
         {
             _screenSize = screenSize;
             _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
-            _texture = Texture.LoadFromFile("Textures/test.png");
         }
         public void LoadVertexBuffers()
         {
@@ -70,7 +67,6 @@ namespace Renderers
 
         public void UseTexture()
         {
-            _texture.Use();
         }
 
         public void SetView(Matrix4 view)
@@ -100,8 +96,17 @@ namespace Renderers
                 _shader.SetVector3("offset", new Vector3(tile.Identity.X * _screenSize.X / 8, tile.Identity.Y * _screenSize.Y / 8, 1));
                 _shader.SetVector4("tileColour", tile.Color);
 
+                int activeTextureLocation = GL.GetUniformLocation(_shader.Handle, "activeTexture");
+                GL.Uniform1(activeTextureLocation, 0);
+
+                // Load and bind texture for the current tile
+                int textureHandle = Texture.LoadFromFile(tile.TexturePath); // Assuming each tile has a TexturePath property
+                GL.BindTexture(TextureTarget.Texture2D, textureHandle);
+
+                // Draw the tile
                 GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
             }
+
         }
 
         public void ResizeBoard(Vector2 Size)
@@ -119,6 +124,8 @@ namespace Renderers
 
             GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
         }
+
+        public void SetTexture(){}
 
         public void BindVertexArray()
         {

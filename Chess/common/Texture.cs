@@ -1,4 +1,5 @@
 using OpenTK.Graphics.OpenGL4;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
@@ -7,14 +8,34 @@ namespace Common
 {
     public class Texture
     {
-        private int _handle;
+          private static Dictionary<string, int> _textureHandles;
+          private int _handle;
+
+        static Texture()
+        {
+            _textureHandles = new Dictionary<string, int>();
+        }
 
         public Texture(int handle)
         {
             _handle = handle;
         }
 
-        public static Texture LoadFromFile(string path)
+        public static int LoadFromFile(string path)
+        {
+            if (_textureHandles.ContainsKey(path))
+            {
+                return _textureHandles[path];
+            }
+            else
+            {
+                int handle = GenerateTexture(path);
+                _textureHandles.Add(path, handle);
+                return handle;
+            }
+        }
+
+        public static int GenerateTexture(string path)
         {
               // Generate handle
             int handle = GL.GenTexture();
@@ -89,7 +110,7 @@ namespace Common
             // Here is an example of mips in action https://en.wikipedia.org/wiki/File:Mipmap_Aliasing_Comparison.png
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-            return new Texture(handle);
+            return handle;
         }
         public void Use()
         {
