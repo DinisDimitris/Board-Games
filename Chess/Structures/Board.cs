@@ -11,7 +11,7 @@ namespace Structures
 
             Vector4 color;
 
-            string texture = "Textures/test.png";
+            string texture = "";
 
             for (int x = 0; x < 8; x++)
             {
@@ -22,14 +22,15 @@ namespace Structures
                     //whites
                     if ((y % 2 == 0 && x % 2 == 0) | (y % 2 == 1 && x % 2 == 1))
                     {
+
                         color = new Vector4(1, 1, 1, 1);
 
-                        texture = "Textures/white_rook.png";
+                        texture = "Textures/bishop1.png";
 
                     }
                     else
                     {
-                        texture = "Textures/test.png";
+                       texture = "";
                         color = new Vector4(0, 0, 0, 0);
                     }
 

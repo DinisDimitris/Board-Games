@@ -93,19 +93,27 @@ namespace Renderers
 
             foreach (var tile in board)
             {
+                int activeTextureLocation = GL.GetUniformLocation(_shader.Handle, "activeTexture");
+
+                if (tile.TexturePath != "")
+                {
+                    // Load and bind texture for the current tile
+                    int textureHandle = Texture.LoadFromFile(tile.TexturePath);
+                    GL.BindTexture(TextureTarget.Texture2D, textureHandle);
+                    GL.Uniform1(activeTextureLocation, 0); // Texture is active
+                }
+                else
+                {
+                    GL.Uniform1(activeTextureLocation, -1); // No texture is active
+                }
+
                 _shader.SetVector3("offset", new Vector3(tile.Identity.X * _screenSize.X / 8, tile.Identity.Y * _screenSize.Y / 8, 1));
                 _shader.SetVector4("tileColour", tile.Color);
-
-                int activeTextureLocation = GL.GetUniformLocation(_shader.Handle, "activeTexture");
-                GL.Uniform1(activeTextureLocation, 0);
-
-                // Load and bind texture for the current tile
-                int textureHandle = Texture.LoadFromFile(tile.TexturePath); // Assuming each tile has a TexturePath property
-                GL.BindTexture(TextureTarget.Texture2D, textureHandle);
 
                 // Draw the tile
                 GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
             }
+
 
         }
 
@@ -125,7 +133,7 @@ namespace Renderers
             GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
         }
 
-        public void SetTexture(){}
+        public void SetTexture() { }
 
         public void BindVertexArray()
         {

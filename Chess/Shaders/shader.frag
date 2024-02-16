@@ -17,7 +17,10 @@ void main()
         outputColor = texture(texture0, texCoord);
     else if (activeTexture == 1)
         outputColor = texture(texture1, texCoord);
-    // Add more conditions for additional textures
+        
+    if (activeTexture < 0) // No texture is active, use tile color directly
+        outputColor = tileColour;
+        
 
     if (outputColor.a < 0.5)
         outputColor = tileColour;
