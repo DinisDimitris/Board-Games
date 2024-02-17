@@ -95,10 +95,10 @@ namespace Renderers
             {
                 int activeTextureLocation = GL.GetUniformLocation(_shader.Handle, "activeTexture");
 
-                if (tile.TexturePath != "")
+                if (tile.Texture != "")
                 {
                     // Load and bind texture for the current tile
-                    int textureHandle = Texture.LoadFromFile(tile.TexturePath);
+                    int textureHandle = Texture.LoadFromFile(tile.Texture);
                     GL.BindTexture(TextureTarget.Texture2D, textureHandle);
                     GL.Uniform1(activeTextureLocation, 0); // Texture is active
                 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using OpenTK.Mathematics;
 
 namespace Structures
@@ -33,8 +34,6 @@ namespace Structures
                     if (textCordsByTexturePath.TryGetValue(position, out string textPath))
                         texture = "Textures/" + textPath;
 
-
-                    Console.WriteLine(texture);
                     board[x, y] = new Tile(position, color, texture);
                 }
             }
@@ -75,6 +74,45 @@ namespace Structures
 
             return startingPositions;
         }
+        
+        public static List<Vector2> GetLegalMoves(Tile[,] _board, Tile tile)
+        {
+            List<Vector2> legalMoves = new List<Vector2>();
 
+            var texture = tile.Texture;
+            var position = tile.Identity;
+
+            int forwardDirection = 1; // Assuming positive y-direction is forward for White pieces
+            if (texture.Contains("1"))
+            {
+                forwardDirection = -1; // Reverse direction for Black pieces
+            }
+
+            // Check if the tile in front of the pawn is empty
+            int forwardX = (int)position.X;
+            int forwardY = (int)position.Y + forwardDirection;
+            if (forwardY >= 0 && forwardY < _board.GetLength(1) && _board[forwardX, forwardY].Texture == "")
+            {
+                legalMoves.Add(new Vector2(forwardX, forwardY));
+            }
+
+            if (IsStartingPosition(position, texture))
+            {
+                int doubleForwardY = (int)position.Y + 2 * forwardDirection;
+                if (doubleForwardY >= 0 && doubleForwardY < _board.GetLength(1) && _board[forwardX, doubleForwardY].Texture == "")
+                {
+                    legalMoves.Add(new Vector2(forwardX, doubleForwardY));
+                }
+            }
+
+            // TODO: Add logic for capturing opponent's pieces diagonally (if applicable)
+
+            return legalMoves;
+        }   
+
+    private static bool IsStartingPosition(Vector2 position, string texture)
+    {
+        return (texture.Contains("pawn") && position.Y == 1) || (texture.Contains("pawn1") && position.Y == 6);
+    }
     }
 }

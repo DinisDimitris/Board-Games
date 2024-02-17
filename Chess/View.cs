@@ -6,6 +6,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
+using System.Collections.Generic;
 
 namespace Engine.Window
 {
@@ -15,7 +16,8 @@ namespace Engine.Window
         private static bool _moveChosen = false;
 
         private static Vector4 _clickColor = new Vector4(0.9f, 0.6f, 0.4f, 1.0f);
-        private static Tile _tempTile;
+        private static Tile _tempColorTile;
+        private static List<Vector2> _tempMoveTiles;
         private static Tile[,] _board;
 
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
@@ -33,9 +35,9 @@ namespace Engine.Window
 
             _board = Board.GenerateBoard();
 
-            _board[5,5].Piece = new Piece(new Vector4(0,1,0,1));
+            _tempColorTile = new Tile(new Vector2(1,1), new Vector4(1,1,1,1), "test.png");
 
-            _tempTile = new Tile(new Vector2(1,1), new Vector4(1,1,1,1), "test.png");
+            _tempMoveTiles = new List<Vector2>();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -77,12 +79,20 @@ namespace Engine.Window
 
             if (x >= 0 && x < 8 && y >= 0 && y < 8)
             {
-                if (MouseState.IsButtonPressed(MouseButton.Left))
+                if (MouseState.IsButtonPressed(MouseButton.Left) && _board[x,y].Texture != "")
                 {
+                    var legalMoves = Board.GetLegalMoves(_board, _board[x,y]);
+
                     if (!_moveChosen)
                     {
-                        _tempTile.Identity = _board[x,y].Identity;
-                        _tempTile.Color = _board[x, y].Color;
+                        _tempColorTile.Identity = _board[x,y].Identity;
+                        _tempColorTile.Color = _board[x, y].Color;
+
+                        foreach(var legalMove in legalMoves)
+                        {
+                            _board[(int)legalMove.X,(int)legalMove.Y].Texture = "Textures/dot.png";
+                            _tempMoveTiles.Add(legalMove);
+                        }
 
                         _board[x, y].Color = _clickColor;
 
@@ -90,12 +100,17 @@ namespace Engine.Window
                     }
                     else
                     {
-                        _board[(int)_tempTile.Identity.X, (int)_tempTile.Identity.Y].Color = _tempTile.Color;
+                        foreach(var tempMoveTile in _tempMoveTiles)
+                        {
+                            _board[(int)tempMoveTile.X, (int)tempMoveTile.Y].Texture = "";
+                        }
+                        
+                        _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Color = _tempColorTile.Color;
                         _moveChosen = false;
                     }
 
                     _renderer.SetTileColours(_board[x, y].Color);
-                    Console.WriteLine(mousePositionOnGameScreen.X + " " + mousePositionOnGameScreen.Y);
+                    //Console.WriteLine(mousePositionOnGameScreen.X + " " + mousePositionOnGameScreen.Y);
                 }
             }
         }
