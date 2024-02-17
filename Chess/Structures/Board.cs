@@ -74,11 +74,8 @@ namespace Structures
 
             return startingPositions;
         }
-        
-        public static List<Vector2> GetLegalMoves(Tile[,] _board, Tile tile)
+        public static Dictionary<int, List<Vector2>> GetLegalMoves(Tile[,] _board, Tile tile)
         {
-            List<Vector2> legalMoves = new List<Vector2>();
-
             var texture = tile.Texture;
             var position = tile.Identity;
 
@@ -88,31 +85,104 @@ namespace Structures
                 forwardDirection = -1; // Reverse direction for Black pieces
             }
 
-            // Check if the tile in front of the pawn is empty
+            var legalMoves = new Dictionary<int, List<Vector2>>();
+            if (texture.Contains("pawn"))
+                legalMoves = GetPawnMoves(_board, position, forwardDirection);
+
+
+            // Other pieces' legal moves
+            if (texture.Contains("rook"))
+            {
+               // legalMoves.AddRange(GetRookMoves(_board, position));
+            }
+            else if (texture.Contains("knight"))
+            {
+                //legalMoves.AddRange(GetKnightMoves(_board, position));
+            }
+            // Implement logic for other pieces similarly
+
+            return legalMoves;
+        }
+
+
+        private static Dictionary<int, List<Vector2>> GetPawnMoves(Tile[,] _board, Vector2 position, int forwardDirection){
+            
+            var nonAttackingMoves = new List<Vector2>(); 
+            var attackingMoves = new List<Vector2>(); 
+
             int forwardX = (int)position.X;
             int forwardY = (int)position.Y + forwardDirection;
-            if (forwardY >= 0 && forwardY < _board.GetLength(1) && _board[forwardX, forwardY].Texture == "")
+
+            // Forward movement
+            if (IsInBoard(forwardX, forwardY) && _board[forwardX, forwardY].Texture == "")
             {
-                legalMoves.Add(new Vector2(forwardX, forwardY));
+                nonAttackingMoves.Add(new Vector2(forwardX, forwardY));
             }
 
-            if (IsStartingPosition(position, texture))
+            // Diagonal capturing
+            int leftDiagonalX = forwardX - 1;
+            int rightDiagonalX = forwardX + 1;
+            int diagonalY = forwardY;
+
+            if (IsInBoard(leftDiagonalX, diagonalY))
             {
-                int doubleForwardY = (int)position.Y + 2 * forwardDirection;
-                if (doubleForwardY >= 0 && doubleForwardY < _board.GetLength(1) && _board[forwardX, doubleForwardY].Texture == "")
+                if (_board[leftDiagonalX, diagonalY].Texture != "" && _board[leftDiagonalX, diagonalY].Texture.Contains("1") != forwardDirection.Equals(-1))
                 {
-                    legalMoves.Add(new Vector2(forwardX, doubleForwardY));
+                    attackingMoves.Add(new Vector2(leftDiagonalX, diagonalY));
                 }
             }
 
-            // TODO: Add logic for capturing opponent's pieces diagonally (if applicable)
+            if (IsInBoard(rightDiagonalX, diagonalY))
+            {
+                if (_board[rightDiagonalX, diagonalY].Texture != "" && _board[rightDiagonalX, diagonalY].Texture.Contains("1") != forwardDirection.Equals(-1))
+                {
+                    attackingMoves.Add(new Vector2(rightDiagonalX, diagonalY));
+                }
+            }
 
+            // Pawn's starting position double movement
+            if (IsStartingPosition(position, forwardDirection))
+            {
+                int doubleForwardY = (int)position.Y + 2 * forwardDirection;
+                if (IsInBoard(forwardX, doubleForwardY) && _board[forwardX, doubleForwardY].Texture == "")
+                {
+                    nonAttackingMoves.Add(new Vector2(forwardX, doubleForwardY));
+                }
+            }
+
+            var dict = new Dictionary<int , List<Vector2>>{
+                {0, nonAttackingMoves},
+                {1, attackingMoves}
+            };
+
+            return dict;
+        }
+
+        private static List<Vector2> GetRookMoves(Tile[,] _board, Vector2 position)
+        {
+            List<Vector2> legalMoves = new List<Vector2>();
+            // Implement rook legal moves logic
             return legalMoves;
-        }   
+        }
 
-    private static bool IsStartingPosition(Vector2 position, string texture)
-    {
-        return (texture.Contains("pawn") && position.Y == 1) || (texture.Contains("pawn1") && position.Y == 6);
-    }
+        private static List<Vector2> GetKnightMoves(Tile[,] _board, Vector2 position)
+        {
+            List<Vector2> legalMoves = new List<Vector2>();
+            // Implement knight legal moves logic
+            return legalMoves;
+        }
+
+        // Implement similar methods for other pieces like bishop, queen, and king
+
+        private static bool IsInBoard(int x, int y)
+        {
+            return x >= 0 && x < 8 && y >= 0 && y < 8;
+        }
+
+        private static bool IsStartingPosition(Vector2 position, int forwardDirection)
+        {
+            return (forwardDirection == 1 && position.Y == 1) || (forwardDirection == -1 && position.Y == 6);
+        }
+
     }
 }

@@ -7,6 +7,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Engine.Window
 {
@@ -16,9 +17,13 @@ namespace Engine.Window
         private static bool _moveChosen = false;
 
         private static Vector4 _clickColor = new Vector4(0.9f, 0.6f, 0.4f, 1.0f);
+        private static Vector4 _attackColor = new Vector4(1.0f, 0.0f, 0.0f, 0.1f);
         private static Tile _tempColorTile;
         private static List<Vector2> _tempMoveTiles;
+        private static List<Vector2> _tempAttackTiles;
         private static Tile[,] _board;
+
+        private const string DOT_TEXTURE = "Textures/dot.png";
 
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
             : base(gameWindowSettings, nativeWindowSettings)
@@ -38,6 +43,8 @@ namespace Engine.Window
             _tempColorTile = new Tile(new Vector2(1,1), new Vector4(1,1,1,1), "test.png");
 
             _tempMoveTiles = new List<Vector2>();
+
+            _tempAttackTiles = new List<Vector2>();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -88,27 +95,40 @@ namespace Engine.Window
                         _tempColorTile.Identity = _board[x,y].Identity;
                         _tempColorTile.Color = _board[x, y].Color;
 
-                        foreach(var legalMove in legalMoves)
+                        var nonAttackingMoves = legalMoves[0];
+                        var attackingMoves = legalMoves[1];
+
+                        foreach(var legalMove in nonAttackingMoves)
                         {
-                            _board[(int)legalMove.X,(int)legalMove.Y].Texture = "Textures/dot.png";
+                            _board[(int)legalMove.X,(int)legalMove.Y].Texture = DOT_TEXTURE;
                             _tempMoveTiles.Add(legalMove);
                         }
 
+                        foreach(var legalMove in attackingMoves)
+                        {
+                             _board[(int)legalMove.X,(int)legalMove.Y].Color = _attackColor;
+                             _tempAttackTiles.Add(legalMove);
+
+                        }
                         _board[x, y].Color = _clickColor;
 
                         _moveChosen = true;
                     }
                     else
                     {
-
                         foreach(var tempMoveTile in _tempMoveTiles)
                         {
                             _board[(int)tempMoveTile.X, (int)tempMoveTile.Y].Texture = "";
                         }
 
+                        foreach(var tempAttackTile in _tempAttackTiles)
+                        {
+                            _board[(int)tempAttackTile.X, (int)tempAttackTile.Y].Color = _tempColorTile.Color;
+                        }
+
                         var mouseHoveringPos = new Vector2(x,y);
 
-                        if (_tempMoveTiles.Contains(mouseHoveringPos))
+                        if (_tempMoveTiles.Contains(mouseHoveringPos) || _tempAttackTiles.Contains(mouseHoveringPos) )
                         {
                             _board[(int)mouseHoveringPos.X, (int) mouseHoveringPos.Y].Texture = _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture;
 
@@ -121,6 +141,7 @@ namespace Engine.Window
 
 
                         _tempMoveTiles = new List<Vector2>();
+                        _tempAttackTiles = new List<Vector2>();
                     }
 
                     _renderer.SetTileColours(_board[x, y].Color);
