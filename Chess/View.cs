@@ -79,11 +79,11 @@ namespace Engine.Window
 
             if (x >= 0 && x < 8 && y >= 0 && y < 8)
             {
-                if (MouseState.IsButtonPressed(MouseButton.Left) && _board[x,y].Texture != "")
+                if (MouseState.IsButtonPressed(MouseButton.Left))
                 {
                     var legalMoves = Board.GetLegalMoves(_board, _board[x,y]);
 
-                    if (!_moveChosen)
+                    if (!_moveChosen && _board[x,y].Texture != "")
                     {
                         _tempColorTile.Identity = _board[x,y].Identity;
                         _tempColorTile.Color = _board[x, y].Color;
@@ -100,13 +100,27 @@ namespace Engine.Window
                     }
                     else
                     {
+
                         foreach(var tempMoveTile in _tempMoveTiles)
                         {
                             _board[(int)tempMoveTile.X, (int)tempMoveTile.Y].Texture = "";
                         }
-                        
+
+                        var mouseHoveringPos = new Vector2(x,y);
+
+                        if (_tempMoveTiles.Contains(mouseHoveringPos))
+                        {
+                            _board[(int)mouseHoveringPos.X, (int) mouseHoveringPos.Y].Texture = _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture;
+
+                            _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture = "";
+                        }
+
                         _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Color = _tempColorTile.Color;
                         _moveChosen = false;
+
+
+
+                        _tempMoveTiles = new List<Vector2>();
                     }
 
                     _renderer.SetTileColours(_board[x, y].Color);
