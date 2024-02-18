@@ -16,11 +16,11 @@ namespace Engine.Window
         private static Renderer _renderer;
         private static bool _moveChosen = false;
 
-        private static Vector4 _clickColor = new Vector4(0.9f, 0.6f, 0.4f, 1.0f);
+        private static Vector4 _clickColor = new Vector4(0.0f, 0.8f, 0.2f, 1.0f);
         private static Vector4 _attackColor = new Vector4(1.0f, 0.0f, 0.0f, 0.1f);
         private static Tile _tempColorTile;
         private static List<Vector2> _tempMoveTiles;
-        private static List<Vector2> _tempAttackTiles;
+        private static Dictionary<Vector2, Vector4> _tempAttackTiles;
         private static Tile[,] _board;
 
         private const string DOT_TEXTURE = "Textures/dot.png";
@@ -40,11 +40,12 @@ namespace Engine.Window
 
             _board = Board.GenerateBoard();
 
-            _tempColorTile = new Tile(new Vector2(1,1), new Vector4(1,1,1,1), "test.png");
+            _tempColorTile = new Tile(new Vector2(1, 1), new Vector4(1, 1, 1, 1), "test.png");
 
             _tempMoveTiles = new List<Vector2>();
 
-            _tempAttackTiles = new List<Vector2>();
+            _tempAttackTiles = new Dictionary<Vector2, Vector4>();       
+            
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -88,66 +89,73 @@ namespace Engine.Window
             {
                 if (MouseState.IsButtonPressed(MouseButton.Left))
                 {
-                    var legalMoves = Board.GetLegalMoves(_board, _board[x,y]);
+                    var legalMoves = Board.GetLegalMoves(_board, _board[x, y]);
 
-                    if (!_moveChosen && _board[x,y].Texture != "")
+                    if (!_moveChosen && _board[x, y].Texture != "")
                     {
-                        _tempColorTile.Identity = _board[x,y].Identity;
+                        _tempColorTile.Identity = _board[x, y].Identity;
                         _tempColorTile.Color = _board[x, y].Color;
 
                         var nonAttackingMoves = legalMoves[0];
                         var attackingMoves = legalMoves[1];
 
-                        foreach(var legalMove in nonAttackingMoves)
+                        foreach (var legalMove in nonAttackingMoves)
                         {
-                            _board[(int)legalMove.X,(int)legalMove.Y].Texture = DOT_TEXTURE;
+                            _board[(int)legalMove.X, (int)legalMove.Y].Texture = DOT_TEXTURE;
                             _tempMoveTiles.Add(legalMove);
                         }
 
-                        foreach(var legalMove in attackingMoves)
+                        foreach (var legalMove in attackingMoves)
                         {
-                             _board[(int)legalMove.X,(int)legalMove.Y].Color = _attackColor;
-                             _tempAttackTiles.Add(legalMove);
-
+                            _tempAttackTiles[legalMove] = _board[(int)legalMove.X, (int)legalMove.Y].Color;
+                            _board[(int)legalMove.X, (int)legalMove.Y].Color = _attackColor;
                         }
+
                         _board[x, y].Color = _clickColor;
 
                         _moveChosen = true;
                     }
                     else
                     {
-                        foreach(var tempMoveTile in _tempMoveTiles)
-                        {
-                            _board[(int)tempMoveTile.X, (int)tempMoveTile.Y].Texture = "";
-                        }
-
-                        foreach(var tempAttackTile in _tempAttackTiles)
-                        {
-                            _board[(int)tempAttackTile.X, (int)tempAttackTile.Y].Color = _tempColorTile.Color;
-                        }
-
-                        var mouseHoveringPos = new Vector2(x,y);
-
-                        if (_tempMoveTiles.Contains(mouseHoveringPos) || _tempAttackTiles.Contains(mouseHoveringPos) )
-                        {
-                            _board[(int)mouseHoveringPos.X, (int) mouseHoveringPos.Y].Texture = _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture;
-
-                            _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture = "";
-                        }
-
-                        _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Color = _tempColorTile.Color;
+                        ResetTiles(x,y);
                         _moveChosen = false;
 
-
-
                         _tempMoveTiles = new List<Vector2>();
-                        _tempAttackTiles = new List<Vector2>();
+                        _tempAttackTiles = new Dictionary<Vector2, Vector4>();
                     }
 
                     _renderer.SetTileColours(_board[x, y].Color);
-                    //Console.WriteLine(mousePositionOnGameScreen.X + " " + mousePositionOnGameScreen.Y);
                 }
             }
+        }
+
+        private static void ResetTiles(int x, int y)
+        {
+            foreach (var tempMoveTile in _tempMoveTiles)
+            {
+                _board[(int)tempMoveTile.X, (int)tempMoveTile.Y].Texture = "";
+            }
+
+            foreach (var tempAttackTile in _tempAttackTiles)
+            {
+                var tileCords = tempAttackTile.Key;
+                var previousTileColor = tempAttackTile.Value;
+
+                _board[(int)tileCords.X, (int)tileCords.Y].Color = previousTileColor;
+            }
+
+            var mouseHoveringPos = new Vector2(x, y);
+
+            // move or capture, either way texture has to move
+            if (_tempMoveTiles.Contains(mouseHoveringPos) || _tempAttackTiles.Keys.Contains(mouseHoveringPos))
+            {
+                _board[x, y].Texture = _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture;
+
+                _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture = "";
+            }
+
+
+            _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Color = _tempColorTile.Color;
         }
 
         protected override void OnResize(ResizeEventArgs e)

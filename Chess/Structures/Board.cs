@@ -93,11 +93,11 @@ namespace Structures
             // Other pieces' legal moves
             if (texture.Contains("rook"))
             {
-               // legalMoves.AddRange(GetRookMoves(_board, position));
+                // legalMoves.AddRange(GetRookMoves(_board, position));
             }
             else if (texture.Contains("knight"))
             {
-                //legalMoves.AddRange(GetKnightMoves(_board, position));
+                legalMoves = GetKnightMoves(_board, position);
             }
             // Implement logic for other pieces similarly
 
@@ -105,21 +105,20 @@ namespace Structures
         }
 
 
-        private static Dictionary<int, List<Vector2>> GetPawnMoves(Tile[,] _board, Vector2 position, int forwardDirection){
-            
-            var nonAttackingMoves = new List<Vector2>(); 
-            var attackingMoves = new List<Vector2>(); 
+        private static Dictionary<int, List<Vector2>> GetPawnMoves(Tile[,] _board, Vector2 position, int forwardDirection)
+        {
+
+            var nonAttackingMoves = new List<Vector2>();
+            var attackingMoves = new List<Vector2>();
 
             int forwardX = (int)position.X;
             int forwardY = (int)position.Y + forwardDirection;
 
-            // Forward movement
             if (IsInBoard(forwardX, forwardY) && _board[forwardX, forwardY].Texture == "")
             {
                 nonAttackingMoves.Add(new Vector2(forwardX, forwardY));
             }
 
-            // Diagonal capturing
             int leftDiagonalX = forwardX - 1;
             int rightDiagonalX = forwardX + 1;
             int diagonalY = forwardY;
@@ -143,14 +142,22 @@ namespace Structures
             // Pawn's starting position double movement
             if (IsStartingPosition(position, forwardDirection))
             {
-                int doubleForwardY = (int)position.Y + 2 * forwardDirection;
-                if (IsInBoard(forwardX, doubleForwardY) && _board[forwardX, doubleForwardY].Texture == "")
+                var doubleForwardY = (int)position.Y + 2 * forwardDirection;
+                var singleForwardY = (int)position.Y + 1 * forwardDirection;
+
+                var blockedAhead = false;
+                if (_board[forwardX, singleForwardY].Texture != "")
+                {
+                    blockedAhead = true;
+                }
+
+                if (_board[forwardX, doubleForwardY].Texture == "" && !blockedAhead)
                 {
                     nonAttackingMoves.Add(new Vector2(forwardX, doubleForwardY));
                 }
             }
 
-            var dict = new Dictionary<int , List<Vector2>>{
+            var dict = new Dictionary<int, List<Vector2>>{
                 {0, nonAttackingMoves},
                 {1, attackingMoves}
             };
@@ -161,16 +168,43 @@ namespace Structures
         private static List<Vector2> GetRookMoves(Tile[,] _board, Vector2 position)
         {
             List<Vector2> legalMoves = new List<Vector2>();
-            // Implement rook legal moves logic
             return legalMoves;
         }
 
-        private static List<Vector2> GetKnightMoves(Tile[,] _board, Vector2 position)
+        private static Dictionary<int, List<Vector2>> GetKnightMoves(Tile[,] _board, Vector2 position)
         {
-            List<Vector2> legalMoves = new List<Vector2>();
-            // Implement knight legal moves logic
+            var legalMoves = new Dictionary<int, List<Vector2>>();
+
+            int[] dx = { 1, 1, 2, 2, -1, -1, -2, -2 };
+            int[] dy = { 2, -2, 1, -1, 2, -2, 1, -1 };
+
+            legalMoves[0] = new List<Vector2>(); // Non-attacking moves
+            legalMoves[1] = new List<Vector2>(); // Attacking moves
+
+            for (int i = 0; i < 8; i++)
+            {
+                int newX = (int)position.X + dx[i];
+                int newY = (int)position.Y + dy[i];
+
+                if (IsInBoard(newX, newY))
+                {
+                    if (_board[newX, newY].Texture == "")
+                    {
+                        legalMoves[0].Add(new Vector2(newX, newY)); // Non-attacking move
+                    }
+                    else
+                    {
+                        // Check if the knight can capture the piece
+                        if (_board[newX, newY].Texture.Contains("1") != _board[(int)position.X, (int)position.Y].Texture.Contains("1"))
+                        {
+                            legalMoves[1].Add(new Vector2(newX, newY)); // Attacking move
+                        }
+                    }
+                }
+            }
+
             return legalMoves;
-        }
+}
 
         // Implement similar methods for other pieces like bishop, queen, and king
 

@@ -6,8 +6,6 @@ namespace Structures
     {
         public Vector2 Identity;
         public Vector4 Color;
-
-        public Piece Piece {get; set;}
         public string Texture { get; internal set; }
 
         public Tile(Vector2 identity, Vector4 color, string texture)
