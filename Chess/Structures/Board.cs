@@ -101,6 +101,7 @@ namespace Structures
 
             if (texture.Contains("bishop"))
                 legalMoves = PieceHelper.GetBishopMoves(_board, position);
+
             return legalMoves;
         }
 }

@@ -24,6 +24,8 @@ namespace Engine.Window
         private static Tile[,] _board;
 
         private static string _blacksTurn = "1";
+        private static Vector4 _checkedColor = new Vector4(0.5f, 0.3f, 0.4f, 0.1f);
+        private static bool _checked = false;
         private const string DOT_TEXTURE = "Textures/dot.png";
 
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
@@ -95,6 +97,7 @@ namespace Engine.Window
 
                     if (!_moveChosen && _board[x, y].Texture != "" && turn) // show moves
                     {
+                        if (!_checked || (_checked && _board[x,y].Texture.Contains("king")) ){
                         _tempColorTile.Identity = _board[x, y].Identity;
                         _tempColorTile.Color = _board[x, y].Color;
 
@@ -116,10 +119,11 @@ namespace Engine.Window
                         _board[x, y].Color = _clickColor;
 
                         _moveChosen = true;
+                        }
                     }
                     else
                     {
-                        ResetTiles(x,y);
+                        SetMove(x,y);
                         _moveChosen = false;
 
                         _tempMoveTiles = new List<Vector2>();
@@ -131,7 +135,7 @@ namespace Engine.Window
             }
         }
 
-        private static void ResetTiles(int x, int y)
+        private static void SetMove(int x, int y)
         {
             foreach (var tempMoveTile in _tempMoveTiles)
             {
@@ -143,7 +147,17 @@ namespace Engine.Window
                 var tileCords = tempAttackTile.Key;
                 var previousTileColor = tempAttackTile.Value;
 
-                _board[(int)tileCords.X, (int)tileCords.Y].Color = previousTileColor;
+                if (_board[(int)tileCords.X, (int)tileCords.Y].Color != _checkedColor)
+                    _board[(int)tileCords.X, (int)tileCords.Y].Color = previousTileColor;
+
+                var oppositeKing = _blacksTurn == "1" ? "king1" : "king0"; 
+
+                if (_board[(int)tileCords.X, (int)tileCords.Y].Texture.Contains(oppositeKing))
+                {
+                    _board[(int)tileCords.X, (int)tileCords.Y].Color = _checkedColor;
+
+                    _checked = true;
+                }
             }
 
             var mouseHoveringPos = new Vector2(x, y);
@@ -157,7 +171,6 @@ namespace Engine.Window
 
                 _blacksTurn = _blacksTurn == "1" ? "0" : "1";
             }
-
 
             _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Color = _tempColorTile.Color;
         }
