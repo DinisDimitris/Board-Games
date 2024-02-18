@@ -23,6 +23,7 @@ namespace Engine.Window
         private static Dictionary<Vector2, Vector4> _tempAttackTiles;
         private static Tile[,] _board;
 
+        private static string _blacksTurn = "1";
         private const string DOT_TEXTURE = "Textures/dot.png";
 
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
@@ -44,8 +45,7 @@ namespace Engine.Window
 
             _tempMoveTiles = new List<Vector2>();
 
-            _tempAttackTiles = new Dictionary<Vector2, Vector4>();       
-            
+            _tempAttackTiles = new Dictionary<Vector2, Vector4>();  
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -83,15 +83,17 @@ namespace Engine.Window
             var mousePositionOnGameScreen = new Vector2((int)(mousePosition.X / tileUnit.X), (int)(flippedY / tileUnit.Y));
 
             var x = (int)mousePositionOnGameScreen.X;
-            var y = (int)mousePositionOnGameScreen.Y;
+            var y = (int)mousePositionOnGameScreen.Y; 
 
             if (x >= 0 && x < 8 && y >= 0 && y < 8)
             {
+                var turn = !_board[x,y].Texture.Contains(_blacksTurn);
+
                 if (MouseState.IsButtonPressed(MouseButton.Left))
                 {
                     var legalMoves = Board.GetLegalMoves(_board, _board[x, y]);
 
-                    if (!_moveChosen && _board[x, y].Texture != "")
+                    if (!_moveChosen && _board[x, y].Texture != "" && turn) // show moves
                     {
                         _tempColorTile.Identity = _board[x, y].Identity;
                         _tempColorTile.Color = _board[x, y].Color;
@@ -152,6 +154,8 @@ namespace Engine.Window
                 _board[x, y].Texture = _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture;
 
                 _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture = "";
+
+                _blacksTurn = _blacksTurn == "1" ? "0" : "1";
             }
 
 
