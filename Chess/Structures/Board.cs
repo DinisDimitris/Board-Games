@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using OpenTK.Mathematics;
 
 namespace Structures
@@ -89,18 +87,20 @@ namespace Structures
             if (texture.Contains("pawn"))
                 legalMoves = PieceHelper.GetPawnMoves(_board, position, forwardDirection);
 
-
-            // Other pieces' legal moves
             if (texture.Contains("rook"))
-            {
-                // legalMoves.AddRange(GetRookMoves(_board, position));
-            }
-            else if (texture.Contains("knight"))
-            {
-                legalMoves = PieceHelper.GetKnightMoves(_board, position);
-            }
-            // Implement logic for other pieces similarly
+                legalMoves = PieceHelper.GetRookMoves(_board, position);
 
+            if (texture.Contains("knight"))
+                legalMoves = PieceHelper.GetKnightMoves(_board, position);
+
+            if (texture.Contains("queen"))
+                legalMoves = PieceHelper.GetQueenMoves(_board, position);
+
+            if (texture.Contains("king"))
+                legalMoves = PieceHelper.GetKingMoves(_board, position);
+
+            if (texture.Contains("bishop"))
+                legalMoves = PieceHelper.GetBishopMoves(_board, position);
             return legalMoves;
         }
 }
