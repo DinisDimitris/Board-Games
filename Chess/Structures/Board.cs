@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OpenTK.Mathematics;
 
@@ -104,5 +105,37 @@ namespace Structures
 
             return legalMoves;
         }
-}
+
+        public static bool IsOpponentInCheck(Tile[,] board, string suffix)
+        {
+            var opponentKingTexture = suffix == "1" ? "king1" : "king0";
+
+            var pieceMoveCheckCount = 0;
+
+            // Check if any of the player's pieces can attack the opponent's king
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (board[i, j].Texture != "" && !board[i, j].Texture.Contains(suffix))
+                    {
+                        var legalMoves = GetLegalMoves(board, board[i, j]);
+                        var attackingMoves = legalMoves[1];
+
+                        foreach (var move in attackingMoves)
+                        {
+                            Console.WriteLine($"attack by {board[i,j].Texture} at {move.X}, {move.Y} on piece : {board[(int)move.X, (int)move.Y].Texture}");
+                            if (board[(int)move.X, (int)move.Y].Texture.Contains(opponentKingTexture)){
+                                return true;
+                            }
+                            }
+                        }
+                        pieceMoveCheckCount += 1;
+                    }
+                }
+
+                return false;
+            }
+            
+        }
 }

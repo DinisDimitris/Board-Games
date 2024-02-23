@@ -97,7 +97,6 @@ namespace Engine.Window
 
                     if (!_moveChosen && _board[x, y].Texture != "" && turn) // show moves
                     {
-                        if (!_checked || (_checked && _board[x,y].Texture.Contains("king")) ){
                         _tempColorTile.Identity = _board[x, y].Identity;
                         _tempColorTile.Color = _board[x, y].Color;
 
@@ -119,7 +118,6 @@ namespace Engine.Window
                         _board[x, y].Color = _clickColor;
 
                         _moveChosen = true;
-                        }
                     }
                     else
                     {
@@ -149,15 +147,6 @@ namespace Engine.Window
 
                 if (_board[(int)tileCords.X, (int)tileCords.Y].Color != _checkedColor)
                     _board[(int)tileCords.X, (int)tileCords.Y].Color = previousTileColor;
-
-                var oppositeKing = _blacksTurn == "1" ? "king1" : "king0"; 
-
-                if (_board[(int)tileCords.X, (int)tileCords.Y].Texture.Contains(oppositeKing))
-                {
-                    _board[(int)tileCords.X, (int)tileCords.Y].Color = _checkedColor;
-
-                    _checked = true;
-                }
             }
 
             var mouseHoveringPos = new Vector2(x, y);
@@ -170,6 +159,13 @@ namespace Engine.Window
                 _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture = "";
 
                 _blacksTurn = _blacksTurn == "1" ? "0" : "1";
+            }
+
+            // check if opponent is checked
+            var opponent =  _blacksTurn == "1" ? "0" : "1";
+            if (Board.IsOpponentInCheck(_board, opponent))
+            {
+                Console.WriteLine("check");
             }
 
             _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Color = _tempColorTile.Color;
