@@ -16,9 +16,10 @@ namespace Engine.Window
         private static Renderer _renderer;
         private static bool _moveChosen = false;
 
-        private static Vector4 _clickColor = new Vector4(0.0f, 0.8f, 0.2f, 1.0f);
-        private static Vector4 _attackColor = new Vector4(1.0f, 0.0f, 0.0f, 0.1f);
-        private static Tile _tempColorTile;
+        private static Vector4 _clickColor = new Vector4(0.0f, 0.6f, 0.2f, 1.0f);
+        private static Vector4 _attackColor = new Vector4(0.6f, 0.0f, 0.0f, 0.1f);
+        private static Tile _tempMoveColorTile;
+        private static Vector4 _tempKingCheckColor;
         private static List<Vector2> _tempMoveTiles;
         private static Dictionary<Vector2, Vector4> _tempAttackTiles;
         private static Tile[,] _board;
@@ -26,6 +27,7 @@ namespace Engine.Window
         private static string _blacksTurn = "1";
         private static Vector4 _checkedColor = new Vector4(0.5f, 0.3f, 0.4f, 0.1f);
         private static bool _checked = false;
+        private static Tile _attackingPiece;
         private const string DOT_TEXTURE = "Textures/dot.png";
 
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
@@ -43,7 +45,7 @@ namespace Engine.Window
 
             _board = Board.GenerateBoard();
 
-            _tempColorTile = new Tile(new Vector2(1, 1), new Vector4(1, 1, 1, 1), "test.png");
+            _tempMoveColorTile = new Tile(new Vector2(1, 1), new Vector4(1, 1, 1, 1), "test.png");
 
             _tempMoveTiles = new List<Vector2>();
 
@@ -97,8 +99,10 @@ namespace Engine.Window
 
                     if (!_moveChosen && _board[x, y].Texture != "" && turn) // show moves
                     {
-                        _tempColorTile.Identity = _board[x, y].Identity;
-                        _tempColorTile.Color = _board[x, y].Color;
+                        if (_checked)
+                            legalMoves = Board.GetDefendingMoves(legalMoves, _attackingPiece, _board[x,y].Texture.Contains("king"));
+                        _tempMoveColorTile.Identity = _board[x, y].Identity;
+                        _tempMoveColorTile.Color = _board[x, y].Color;
 
                         var nonAttackingMoves = legalMoves[0];
                         var attackingMoves = legalMoves[1];
@@ -135,6 +139,8 @@ namespace Engine.Window
 
         private static void SetMove(int x, int y)
         {
+            _checked = false;
+
             foreach (var tempMoveTile in _tempMoveTiles)
             {
                 _board[(int)tempMoveTile.X, (int)tempMoveTile.Y].Texture = "";
@@ -154,9 +160,9 @@ namespace Engine.Window
             // move or capture, either way texture has to move
             if (_tempMoveTiles.Contains(mouseHoveringPos) || _tempAttackTiles.Keys.Contains(mouseHoveringPos))
             {
-                _board[x, y].Texture = _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture;
+                _board[x, y].Texture = _board[(int)_tempMoveColorTile.Identity.X, (int)_tempMoveColorTile.Identity.Y].Texture;
 
-                _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Texture = "";
+                _board[(int)_tempMoveColorTile.Identity.X, (int)_tempMoveColorTile.Identity.Y].Texture = "";
 
                 _blacksTurn = _blacksTurn == "1" ? "0" : "1";
             }
@@ -165,10 +171,16 @@ namespace Engine.Window
             var opponent =  _blacksTurn == "1" ? "0" : "1";
             if (Board.IsOpponentInCheck(_board, opponent))
             {
-                Console.WriteLine("check");
+                _attackingPiece = _board[x,y];
+                var kingInCheck = opponent == "1" ? Board.WhiteKing : Board.BlackKing;
+
+                _tempKingCheckColor = kingInCheck.Color;
+                kingInCheck.Color = _checkedColor;
+
+                _checked = true;
             }
 
-            _board[(int)_tempColorTile.Identity.X, (int)_tempColorTile.Identity.Y].Color = _tempColorTile.Color;
+            _board[(int)_tempMoveColorTile.Identity.X, (int)_tempMoveColorTile.Identity.Y].Color = _tempMoveColorTile.Color;
         }
 
         protected override void OnResize(ResizeEventArgs e)

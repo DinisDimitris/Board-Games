@@ -6,6 +6,9 @@ namespace Structures
 {
     public static class Board
     {
+        public static Tile WhiteKing {get; internal set;}
+        public static Tile BlackKing {get; internal set;}
+
         public static Tile[,] GenerateBoard()
         {
             var board = new Tile[8, 8];
@@ -32,8 +35,15 @@ namespace Structures
                     string texture = "";
                     if (textCordsByTexturePath.TryGetValue(position, out string textPath))
                         texture = "Textures/" + textPath;
+                
 
                     board[x, y] = new Tile(position, color, texture);
+
+                     if (texture.Contains("king0"))
+                        BlackKing = board[x,y];
+
+                     if (texture.Contains("king1"))
+                        WhiteKing = board[x,y];
                 }
             }
 
@@ -103,8 +113,11 @@ namespace Structures
             if (texture.Contains("bishop"))
                 legalMoves = PieceHelper.GetBishopMoves(_board, position);
 
+
             return legalMoves;
         }
+
+
 
         public static bool IsOpponentInCheck(Tile[,] board, string suffix)
         {
@@ -136,6 +149,23 @@ namespace Structures
 
                 return false;
             }
+
+        public static Dictionary<int, List<Vector2>> GetDefendingMoves(Dictionary<int, List<Vector2>> legalMoves, Tile attackingPiece, bool kingMove)
+        {
+            var kingToDefend = attackingPiece.Texture.Contains("1") ? BlackKing : WhiteKing;
+
+            Vector2 attackingPiecePosition = attackingPiece.Identity;
+            Vector2 defendingKingPosition = kingToDefend.Identity;
+
+
+            Console.WriteLine($"Defending king {kingToDefend.Texture} from attacking piece {attackingPiece.Texture}");
+
+             var dict = new Dictionary<int, List<Vector2>>{
+                {0, new List<Vector2>()},
+                {1, new List<Vector2>()}
+            };
+            return dict; 
             
         }
+    }
 }
